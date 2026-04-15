@@ -1,0 +1,57 @@
+name: GCP Cloud Deploy Roadmap
+on:
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: cio-productops-np-a332e6
+  DELIVERY_PIPELINE_NAME: "telus-cio-roadmap"
+  REGION: northamerica-northeast1
+  IMAGE_PATH: northamerica-northeast1-docker.pkg.dev/cio-gke-devops-e4993356/applications/cio-productops/telus-cio-roadmap
+  SERVICE_ACCOUNT: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+  GCS_SOURCE_STAGING_DIR: gs://cio-productops-np-a332e6_clouddeploy/source
+  IMAGE_TAG: "${{ github.sha }}"
+  RELEASE_NAME: "r-${{ github.sha }}-${{ github.run_number }}"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: "${{ secrets.CDO_WORKLOAD_IDENTITY_PROVIDER_GCP }}"
+          service_account: "${{ env.SERVICE_ACCOUNT }}"
+          project_id: "${{ env.PROJECT_ID }}"
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker
+        run: gcloud --quiet auth configure-docker northamerica-northeast1-docker.pkg.dev
+
+      - name: Apply Pipeline
+        run: gcloud deploy apply --file clouddeploy.yaml --region $REGION
+
+      - name: Install Skaffold
+        run: |
+          curl -Lo skaffold https://storage.googleapis.com/skaffold/releases/v2.14.0/skaffold-linux-amd64
+          chmod +x skaffold
+          sudo mv skaffold /usr/local/bin
+
+      - name: Skaffold build
+        run: skaffold build -f skaffold.yaml -p dev --file-output artifacts.json
+
+      - name: Create Release
+        uses: 'telus/cdo-actions-cloud-deploy@v1.6.0'
+        with:
+          action: 'create-release'
+          delivery_pipeline: "${{ env.DELIVERY_PIPELINE_NAME }}"
+          release_name: "${{ env.RELEASE_NAME }}"
+          target_id: 'dev'
+          region: "${{ env.REGION }}"
+          images: "${{ env.IMAGE_PATH }}=${{ env.IMAGE_PATH }}:${{ env.IMAGE_TAG }}"

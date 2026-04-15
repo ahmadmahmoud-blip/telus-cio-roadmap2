@@ -1,0 +1,24 @@
+applicationName: telus-cio-roadmap
+type: service
+environment: st
+image:
+  repository: northamerica-northeast1-docker.pkg.dev/cio-gke-devops-e4993356/applications/cio-productops/telus-cio-roadmap
+  tag: latest
+serviceAccountName: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+ingress: all
+
+# Env variables for Staging
+env:
+  - name: DATABASE_URL
+    value: "your_staging_db_connection_string" 
+  - name: ANTHROPIC_API_KEY
+    value: "your_key"
+  - name: NEXTAUTH_SECRET
+    value: "your_st_secret"
+  - name: NEXTAUTH_URL
+    value: "https://telus-cio-roadmap-st.a.run.app" # Update once known
+
+iap:
+  enabled: false
+invokerIam:
+  disabled: true

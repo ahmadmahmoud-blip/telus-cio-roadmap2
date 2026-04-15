@@ -1,0 +1,46 @@
+apiVersion: deploy.cloud.google.com/v1
+kind: DeliveryPipeline
+metadata:
+  name: "telus-cio-roadmap"
+description: Deploy TELUS CIO Product Roadmap Tool
+serialPipeline:
+  stages:
+    - targetId: dev
+      profiles: [dev]
+    - targetId: st
+      profiles: [st]
+    - targetId: pr
+      profiles: [pr]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: dev
+run:
+  location: projects/cio-productops-np-a332e6/locations/northamerica-northeast1
+executionConfigs:
+  - defaultPool:
+      serviceAccount: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+    usages: [DEPLOY, RENDER]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: st
+run:
+  location: projects/cio-productops-np-a332e6/locations/northamerica-northeast1
+executionConfigs:
+  - defaultPool:
+      serviceAccount: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+    usages: [DEPLOY, RENDER]
+---
+apiVersion: deploy.cloud.google.com/v1
+kind: Target
+metadata:
+  name: pr
+run:
+  location: projects/cio-productops-np-a332e6/locations/northamerica-northeast1
+executionConfigs:
+  - defaultPool:
+      serviceAccount: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+    usages: [DEPLOY, RENDER]

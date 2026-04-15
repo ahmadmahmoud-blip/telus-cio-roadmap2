@@ -1,0 +1,24 @@
+applicationName: telus-cio-roadmap
+type: service
+environment: dev
+image:
+  repository: northamerica-northeast1-docker.pkg.dev/cio-gke-devops-e4993356/applications/cio-productops/telus-cio-roadmap
+  tag: latest
+serviceAccountName: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
+ingress: all
+
+# Env variables for Next.js & Prisma
+env:
+  - name: DATABASE_URL
+    value: "postgresql://USER:PASSWORD@HOST:5432/DB_NAME" # Update this
+  - name: ANTHROPIC_API_KEY
+    value: "your-api-key"
+  - name: NEXTAUTH_SECRET
+    value: "super-secret-string"
+  - name: NEXTAUTH_URL
+    value: "https://your-cloud-run-url.a.run.app"
+
+iap:
+  enabled: false
+invokerIam:
+  disabled: true

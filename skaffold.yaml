@@ -1,0 +1,51 @@
+apiVersion: skaffold/v4beta7
+kind: Config
+metadata:
+  name: "telus-cio-roadmap"
+build:
+  local:
+    concurrency: 2
+  tagPolicy:
+    gitCommit:
+      ignoreChanges: true
+  artifacts:
+    - image: northamerica-northeast1-docker.pkg.dev/cio-gke-devops-e4993356/applications/cio-productops/telus-cio-roadmap
+      context: .
+      docker:
+        dockerfile: 'Dockerfile'
+deploy:
+  cloudrun:
+    projectid: cio-productops-np-a332e6
+    region: northamerica-northeast1
+manifests:
+  helm:
+    releases:
+      - name: "telus-cio-roadmap-dev"
+        remoteChart: "oci://northamerica-northeast1-docker.pkg.dev/cio-gke-devops-e4993356/charts/cdo-cloudrun-deployment"
+        valuesFiles:
+          - ./.cloud-run/dev/values.yaml
+profiles:
+  - name: "dev"
+    patches:
+      - op: replace
+        path: /manifests/helm/releases/0/name
+        value: "telus-cio-roadmap-dev"
+      - op: replace
+        path: /manifests/helm/releases/0/valuesFiles
+        value: [./.cloud-run/dev/values.yaml]
+  - name: "st"
+    patches:
+      - op: replace
+        path: /manifests/helm/releases/0/name
+        value: "telus-cio-roadmap-st"
+      - op: replace
+        path: /manifests/helm/releases/0/valuesFiles
+        value: [./.cloud-run/st/values.yaml]
+  - name: "pr"
+    patches:
+      - op: replace
+        path: /manifests/helm/releases/0/name
+        value: "telus-cio-roadmap-pr"
+      - op: replace
+        path: /manifests/helm/releases/0/valuesFiles
+        value: [./.cloud-run/pr/values.yaml]

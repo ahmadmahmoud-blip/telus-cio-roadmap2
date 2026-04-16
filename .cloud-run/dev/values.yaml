@@ -6,19 +6,22 @@ image:
   tag: latest
 serviceAccountName: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
 ingress: all
-
-# Env variables for Next.js & Prisma
-env:
-  - name: DATABASE_URL
-    value: "postgresql://USER:PASSWORD@HOST:5432/DB_NAME" # Update this
-  - name: ANTHROPIC_API_KEY
-    value: "your-api-key"
-  - name: NEXTAUTH_SECRET
-    value: "super-secret-string"
-  - name: NEXTAUTH_URL
-    value: "https://your-cloud-run-url.a.run.app"
-
 iap:
   enabled: false
 invokerIam:
   disabled: true
+traffic: {}
+sessionAffinity: false
+secretEnv:
+  - name: DATABASE_URL
+    secret: telus-cio-roadmap-database-url
+    version: latest
+  - name: ANTHROPIC_API_KEY
+    secret: telus-cio-roadmap-anthropic-api-key
+    version: latest
+  - name: NEXTAUTH_SECRET
+    secret: telus-cio-roadmap-nextauth-secret
+    version: latest
+  - name: NEXTAUTH_URL
+    secret: telus-cio-roadmap-nextauth-url
+    version: latest

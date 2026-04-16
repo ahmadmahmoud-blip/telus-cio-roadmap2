@@ -6,19 +6,22 @@ image:
   tag: latest
 serviceAccountName: cicd-service-account@cio-productops-np-a332e6.iam.gserviceaccount.com
 ingress: all
-
-# Env variables for Staging
-env:
-  - name: DATABASE_URL
-    value: "your_staging_db_connection_string" 
-  - name: ANTHROPIC_API_KEY
-    value: "your_key"
-  - name: NEXTAUTH_SECRET
-    value: "your_st_secret"
-  - name: NEXTAUTH_URL
-    value: "https://telus-cio-roadmap-st.a.run.app" # Update once known
-
 iap:
   enabled: false
 invokerIam:
   disabled: true
+traffic: {}
+sessionAffinity: false
+secretEnv:
+  - name: DATABASE_URL
+    secret: telus-cio-roadmap-database-url
+    version: latest
+  - name: ANTHROPIC_API_KEY
+    secret: telus-cio-roadmap-anthropic-api-key
+    version: latest
+  - name: NEXTAUTH_SECRET
+    secret: telus-cio-roadmap-nextauth-secret
+    version: latest
+  - name: NEXTAUTH_URL
+    secret: telus-cio-roadmap-nextauth-url
+    version: latest
